@@ -1,4 +1,5 @@
-import initSqlJs, { type Database, type SqlJsStatic } from 'sql.js';
+import initSqlJs from 'sql.js/dist/sql-wasm.js';
+import type { Database, SqlJsStatic } from 'sql.js';
 import type { ColumnInfo, ConstraintInfo, QueryError, QueryResult, TableInfo } from '@sql-brush-up/shared';
 import { classifySqlError } from '@sql-brush-up/shared';
 
@@ -7,7 +8,7 @@ let SQL: SqlJsStatic | null = null;
 export async function initSqlEngine(): Promise<SqlJsStatic> {
   if (SQL) return SQL;
   SQL = await initSqlJs({
-    locateFile: (file) => `https://sql.js.org/dist/${file}`,
+    locateFile: (file) => `/${file}`,
   });
   return SQL;
 }

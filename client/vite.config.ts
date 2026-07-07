@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['sql.js'],
+    include: ['sql.js/dist/sql-wasm.js'],
   },
   build: {
     target: 'esnext',
