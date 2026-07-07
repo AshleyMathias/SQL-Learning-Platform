@@ -1,14 +1,18 @@
-import initSqlJs from 'sql.js/dist/sql-wasm.js';
+import initSqlJsModule from 'sql.js';
 import type { Database, SqlJsStatic } from 'sql.js';
+import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 import type { ColumnInfo, ConstraintInfo, QueryError, QueryResult, TableInfo } from '@sql-brush-up/shared';
 import { classifySqlError } from '@sql-brush-up/shared';
 
 let SQL: SqlJsStatic | null = null;
+const initSqlJs = initSqlJsModule as unknown as (config: {
+  locateFile: (file: string) => string;
+}) => Promise<SqlJsStatic>;
 
 export async function initSqlEngine(): Promise<SqlJsStatic> {
   if (SQL) return SQL;
   SQL = await initSqlJs({
-    locateFile: (file) => `/${file}`,
+    locateFile: () => sqlWasmUrl,
   });
   return SQL;
 }

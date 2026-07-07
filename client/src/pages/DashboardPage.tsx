@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  BookOpen, Code2, Database, Trophy, ArrowRight, Flame, Target, Clock,
+  BookOpen, Code2, Database, Trophy, ArrowRight, Flame, Target, Clock, GraduationCap,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ export function DashboardPage() {
   const continueLesson = progress.continueLessonId
     ? allLessons.find((l) => l.id === progress.continueLessonId)
     : lessons.find((l) => !progress.completedLessons.includes(l.id));
+  const recommendedStart = lessons.find((l) => !progress.completedLessons.includes(l.id)) ?? lessons[0];
 
   useEffect(() => {
     document.title = 'Dashboard — SQL Brush Up';
@@ -80,6 +81,28 @@ export function DashboardPage() {
               <Link to={`/lessons/${continueLesson.slug}`}>
                 Resume Lesson <ArrowRight className="h-4 w-4" />
               </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {skillLevel === 'beginner' && recommendedStart && progress.queryCount === 0 && (
+        <Card className="border-emerald-500/30 bg-emerald-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-emerald-400" />
+              Recommended First Step
+            </CardTitle>
+            <CardDescription>
+              Start with one short lesson, then open the playground when you feel ready.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <Button asChild>
+              <Link to={`/lessons/${recommendedStart.slug}`}>Start First Lesson</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/playground">Peek at Playground</Link>
             </Button>
           </CardContent>
         </Card>

@@ -5,6 +5,10 @@ import { GraduationCap, Sparkles, Rocket, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePreferencesStore } from '@/stores/preferences-store';
+import { useProgressStore } from '@/stores/progress-store';
+import { databaseManager } from '@/services/database';
+import { getStarterSampleDatabase } from '@/services/database/sample-databases';
+import { getFirstLessonForSkillLevel } from '@/services/lessons/lesson-service';
 import type { SkillLevel } from '@sql-brush-up/shared';
 
 const levels: { level: SkillLevel; icon: typeof Sparkles; title: string; description: string }[] = [
@@ -31,17 +35,41 @@ const levels: { level: SkillLevel; icon: typeof Sparkles; title: string; descrip
 export function WelcomePage() {
   const navigate = useNavigate();
   const { setSkillLevel, completeOnboarding } = usePreferencesStore();
+  const { setActiveDatabaseId, setContinueLessonId } = useProgressStore();
   const [selected, setSelected] = useState<SkillLevel | null>(null);
+  const [starting, setStarting] = useState(false);
 
-  function handleContinue() {
+  async function handleContinue() {
     if (!selected) return;
+    setStarting(true);
     setSkillLevel(selected);
     completeOnboarding();
+
+    const starterDatabase = getStarterSampleDatabase(selected);
+    const database = await databaseManager.loadSampleDatabase(
+      starterDatabase.name,
+      starterDatabase.id,
+      starterDatabase.schemaSql,
+      starterDatabase.dataSql
+    );
+    setActiveDatabaseId(database.id);
+
+    const firstLesson = getFirstLessonForSkillLevel(selected);
+    if (firstLesson) {
+      setContinueLessonId(firstLesson.id);
+    }
+
+    if (selected === 'beginner' && firstLesson) {
+      navigate(`/lessons/${firstLesson.slug}`);
+      return;
+    }
+
     if (selected === 'advanced') {
       navigate('/playground');
-    } else {
-      navigate('/dashboard');
+      return;
     }
+
+    navigate('/dashboard');
   }
 
   return (
@@ -94,9 +122,14 @@ export function WelcomePage() {
           </div>
         </div>
 
-        <Button size="lg" disabled={!selected} onClick={handleContinue} className="min-w-[200px]">
-          Continue
-        </Button>
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            We will preload a starter database so you can begin immediately.
+          </p>
+          <Button size="lg" disabled={!selected || starting} onClick={() => void handleContinue()} className="min-w-[200px]">
+            {starting ? 'Preparing your workspace...' : 'Continue'}
+          </Button>
+        </div>
       </motion.div>
     </div>
   );

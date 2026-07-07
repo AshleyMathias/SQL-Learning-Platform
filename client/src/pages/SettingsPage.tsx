@@ -13,8 +13,7 @@ export function SettingsPage() {
 
   useEffect(() => {
     document.title = 'Settings — SQL Brush Up';
-    document.documentElement.classList.toggle('dark', prefs.theme === 'dark');
-  }, [prefs.theme]);
+  }, []);
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">

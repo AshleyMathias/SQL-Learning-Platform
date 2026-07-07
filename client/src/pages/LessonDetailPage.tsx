@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Lightbulb, CheckCircle, Play } from 'lucide-react';
+import { ArrowLeft, Lightbulb, CheckCircle, Play, ArrowRight } from 'lucide-react';
 import { compareQueryResults } from '@sql-brush-up/shared';
 import type { QueryError } from '@sql-brush-up/shared';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,8 @@ export function LessonDetailPage() {
 
   const section = lesson?.sections[sectionIndex];
   const practice = section?.practice;
+  const prevSection = lesson && sectionIndex > 0 ? lesson.sections[sectionIndex - 1] : null;
+  const nextSection = lesson && sectionIndex < lesson.sections.length - 1 ? lesson.sections[sectionIndex + 1] : null;
 
   useEffect(() => {
     if (!lesson) return;
@@ -125,6 +127,46 @@ export function LessonDetailPage() {
         ))}
       </div>
 
+      <Card className="bg-muted/20">
+        <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-6">
+          <div>
+            <p className="text-sm font-medium">
+              Step {sectionIndex + 1} of {lesson.sections.length}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {nextSection ? `Next: ${nextSection.title}` : 'You are on the final section of this lesson.'}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              disabled={!prevSection}
+              onClick={() => {
+                if (!prevSection) return;
+                setSectionIndex(sectionIndex - 1);
+                setHintLevel(0);
+                setShowSolution(false);
+                setPassed(false);
+              }}
+            >
+              Previous
+            </Button>
+            <Button
+              disabled={!nextSection}
+              onClick={() => {
+                if (!nextSection) return;
+                setSectionIndex(sectionIndex + 1);
+                setHintLevel(0);
+                setShowSolution(false);
+                setPassed(false);
+              }}
+            >
+              Next Section <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {section && (
         <Card>
           <CardHeader>
@@ -176,6 +218,9 @@ export function LessonDetailPage() {
             <p className="text-sm text-muted-foreground">{practice.question}</p>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-3 text-sm text-muted-foreground">
+              Try the query yourself first. If you're stuck, reveal hints one at a time instead of jumping to the solution.
+            </div>
             <div className="h-40 border border-border rounded-lg overflow-hidden">
               <SqlEditor value={practiceSql} onChange={setPracticeSql} onRun={() => void runPractice()} />
             </div>

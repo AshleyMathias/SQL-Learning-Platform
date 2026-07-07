@@ -23,6 +23,10 @@ export function getLessonsByTopic(topic: string): Lesson[] {
   return getAllLessons().filter((l) => l.topic === topic);
 }
 
+export function getFirstLessonForSkillLevel(level: string): Lesson | undefined {
+  return getLessonsBySkillLevel(level)[0];
+}
+
 export function searchLessons(query: string): SearchResult[] {
   const q = query.toLowerCase();
   return getAllLessons()

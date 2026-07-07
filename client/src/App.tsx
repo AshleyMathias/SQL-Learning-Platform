@@ -31,10 +31,31 @@ function OnboardingGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const theme = usePreferencesStore((s) => s.theme);
+  const fontSize = usePreferencesStore((s) => s.fontSize);
+
   useEffect(() => {
     void initSqlEngine();
-    document.documentElement.classList.add('dark');
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const applyTheme = () => {
+      const shouldUseDark = theme === 'system' ? prefersDark.matches : theme === 'dark';
+      root.classList.toggle('dark', shouldUseDark);
+    };
+
+    applyTheme();
+    prefersDark.addEventListener('change', applyTheme);
+
+    return () => prefersDark.removeEventListener('change', applyTheme);
+  }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize}px`;
+  }, [fontSize]);
 
   return (
     <BrowserRouter>

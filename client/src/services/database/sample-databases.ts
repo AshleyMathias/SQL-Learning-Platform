@@ -32,3 +32,15 @@ export const SAMPLE_DATABASES: SampleDatabase[] = [
 export function getSampleDatabase(id: string): SampleDatabase | undefined {
   return SAMPLE_DATABASES.find((db) => db.id === id);
 }
+
+export function getStarterSampleDatabase(skillLevel: 'beginner' | 'intermediate' | 'advanced'): SampleDatabase {
+  if (skillLevel === 'advanced') {
+    return northwind;
+  }
+
+  if (skillLevel === 'intermediate') {
+    return ecommerce;
+  }
+
+  return studentManagement;
+}

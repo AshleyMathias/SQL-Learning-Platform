@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
-@theme {
+@theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-background: #0a0a0f;
-  --color-foreground: #f4f4f5;
-  --color-card: #12121a;
-  --color-card-foreground: #f4f4f5;
-  --color-popover: #16161f;
-  --color-popover-foreground: #f4f4f5;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: #3b82f6;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #1e1e2e;
-  --color-secondary-foreground: #e4e4e7;
-  --color-muted: #1a1a24;
-  --color-muted-foreground: #a1a1aa;
-  --color-accent: #1e293b;
-  --color-accent-foreground: #f4f4f5;
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
-  --color-border: #27272a;
-  --color-input: #27272a;
+  --color-border: var(--border);
+  --color-input: var(--input);
   --color-ring: #3b82f6;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
@@ -30,6 +30,40 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --secondary: #eef2ff;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+  --border: #dbe3ee;
+  --input: #dbe3ee;
+}
+
+.dark {
+  --background: #0a0a0f;
+  --foreground: #f4f4f5;
+  --card: #12121a;
+  --card-foreground: #f4f4f5;
+  --popover: #16161f;
+  --popover-foreground: #f4f4f5;
+  --secondary: #1e1e2e;
+  --secondary-foreground: #e4e4e7;
+  --muted: #1a1a24;
+  --muted-foreground: #a1a1aa;
+  --accent: #1e293b;
+  --accent-foreground: #f4f4f5;
+  --border: #27272a;
+  --input: #27272a;
 }
 
 @layer base {

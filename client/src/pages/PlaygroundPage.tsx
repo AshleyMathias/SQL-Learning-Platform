@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Play, Square, AlignLeft, Lightbulb, AlertTriangle } from 'lucide-react';
+import { Play, Square, AlignLeft, Lightbulb, AlertTriangle, Sparkles } from 'lucide-react';
 import { explainQuery } from '@sql-brush-up/shared';
 import type { QueryError, QueryResult } from '@sql-brush-up/shared';
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,15 @@ import { DatabaseExplorer } from '@/components/playground/DatabaseExplorer';
 import { SqlEditor } from '@/components/playground/SqlEditor';
 import { ResultTable } from '@/components/playground/ResultTable';
 import { QueryVisualizer } from '@/components/playground/QueryVisualizer';
+import { VisualTableBuilder, type TableBuilderColumn } from '@/components/playground/VisualTableBuilder';
 import { databaseManager } from '@/services/database';
+import { getStarterSampleDatabase } from '@/services/database/sample-databases';
+import { usePreferencesStore } from '@/stores/preferences-store';
 import { useProgressStore } from '@/stores/progress-store';
 import { formatSql, isDestructiveQuery, formatExecutionTime } from '@/utils';
 
 export function PlaygroundPage() {
+  const skillLevel = usePreferencesStore((s) => s.skillLevel);
   const { activeDatabaseId, setActiveDatabaseId, addQueryHistory, incrementQueryCount } = useProgressStore();
   const [databases, setDatabases] = useState<{ id: string; name: string }[]>([]);
   const [sql, setSql] = useState('SELECT * FROM students LIMIT 10;');
@@ -21,6 +25,36 @@ export function PlaygroundPage() {
   const [running, setRunning] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingQuery, setPendingQuery] = useState('');
+  const [tableCount, setTableCount] = useState(0);
+
+  const starterQueries = [
+    { label: 'See all students', sql: 'SELECT * FROM students LIMIT 10;' },
+    { label: 'Filter adults', sql: 'SELECT first_name, age FROM students WHERE age >= 20;' },
+    { label: 'Count rows', sql: 'SELECT COUNT(*) AS total_rows FROM students;' },
+  ];
+  const emptyDatabaseQueries = [
+    {
+      label: 'Create first table',
+      sql: `CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  age INTEGER,
+  city TEXT
+);`,
+    },
+    {
+      label: 'Insert sample rows',
+      sql: `INSERT INTO students (name, age, city)
+VALUES
+  ('Asha', 21, 'Mumbai'),
+  ('Ravi', 24, 'Pune'),
+  ('Meera', 19, 'Delhi');`,
+    },
+    {
+      label: 'Query your data',
+      sql: 'SELECT * FROM students;',
+    },
+  ];
 
   const loadDatabases = useCallback(async () => {
     const dbs = await databaseManager.listDatabases();
@@ -34,6 +68,34 @@ export function PlaygroundPage() {
     void loadDatabases();
     document.title = 'Playground — SQL Brush Up';
   }, [loadDatabases]);
+
+  useEffect(() => {
+    async function loadTableCount() {
+      if (!activeDatabaseId) {
+        setTableCount(0);
+        return;
+      }
+
+      const engine = await databaseManager.getEngine(activeDatabaseId);
+      setTableCount(engine?.getTables().length ?? 0);
+    }
+
+    void loadTableCount();
+  }, [activeDatabaseId, result, loadDatabases]);
+
+  async function loadStarterDatabase() {
+    const starter = getStarterSampleDatabase(skillLevel);
+    const db = await databaseManager.loadSampleDatabase(
+      starter.name,
+      starter.id,
+      starter.schemaSql,
+      starter.dataSql
+    );
+    setActiveDatabaseId(db.id);
+    setDatabases((prev) =>
+      prev.some((entry) => entry.id === db.id) ? prev : [{ id: db.id, name: db.name }, ...prev]
+    );
+  }
 
   async function executeQuery(query: string) {
     if (!activeDatabaseId) {
@@ -71,6 +133,8 @@ export function PlaygroundPage() {
       } else if (res) {
         setResult(res);
         await databaseManager.persistEngine(activeDatabaseId!);
+        const refreshedEngine = await databaseManager.getEngine(activeDatabaseId!);
+        setTableCount(refreshedEngine?.getTables().length ?? 0);
         incrementQueryCount();
         const db = databases.find((d) => d.id === activeDatabaseId);
         addQueryHistory({
@@ -97,6 +161,12 @@ export function PlaygroundPage() {
 
   const explanation = result ? explainQuery(sql) : null;
 
+  async function createTableFromBuilder(tableName: string, columns: TableBuilderColumn[]) {
+    const createSql = buildCreateTableSql(tableName, columns);
+    await runQuery(createSql);
+    setSql(buildInsertTemplate(tableName, columns));
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-border px-4 py-2">
@@ -115,6 +185,9 @@ export function PlaygroundPage() {
           </select>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => setSql(starterQueries[0].sql)}>
+            <Sparkles className="h-4 w-4" /> Starter Query
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setSql(formatSql(sql))}>
             <AlignLeft className="h-4 w-4" /> Format
           </Button>
@@ -131,6 +204,20 @@ export function PlaygroundPage() {
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
+          <div className="border-b border-border px-4 py-2">
+            <div className="flex flex-wrap gap-2">
+              {(tableCount === 0 ? emptyDatabaseQueries : starterQueries).map((template) => (
+                <Button
+                  key={template.label}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSql(template.sql)}
+                >
+                  {template.label}
+                </Button>
+              ))}
+            </div>
+          </div>
           <div className="flex-1 min-h-[200px]">
             <SqlEditor value={sql} onChange={setSql} onRun={() => void executeQuery(sql)} />
           </div>
@@ -169,7 +256,48 @@ export function PlaygroundPage() {
               )}
               {result?.isSelect && <ResultTable result={result} />}
               {!error && !result && (
-                <p className="p-4 text-sm text-muted-foreground">Run a query to see results.</p>
+                <div className="p-4 space-y-3 text-sm text-muted-foreground">
+                  <p>Run a query to see results.</p>
+                  {!activeDatabaseId && (
+                    <div className="rounded-lg border border-border bg-muted/30 p-3">
+                      <p className="mb-3 text-foreground">No database is selected yet.</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" onClick={() => void loadStarterDatabase()}>
+                          Load Starter Database
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setSql('SELECT 1 AS ready;')}>
+                          Insert Demo Query
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  {activeDatabaseId && tableCount === 0 && (
+                    <div className="rounded-lg border border-border bg-muted/30 p-4">
+                      <p className="mb-2 font-medium text-foreground">This database is empty.</p>
+                      <p className="mb-3">
+                        Start here: first run a `CREATE TABLE` query, then `INSERT INTO`, then `SELECT *`.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {emptyDatabaseQueries.map((template) => (
+                          <Button
+                            key={template.label}
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setSql(template.sql)}
+                          >
+                            {template.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {activeDatabaseId && tableCount === 0 && (
+                    <VisualTableBuilder
+                      disabled={running}
+                      onCreateTable={createTableFromBuilder}
+                    />
+                  )}
+                </div>
               )}
             </TabsContent>
             <TabsContent value="explain" className="flex-1 overflow-auto p-4 m-0">
@@ -214,4 +342,53 @@ export function PlaygroundPage() {
       )}
     </div>
   );
+}
+
+function buildCreateTableSql(tableName: string, columns: TableBuilderColumn[]): string {
+  const safeTableName = escapeIdentifier(tableName);
+  const lines = columns.map((column) => {
+    const parts = [
+      `"${escapeIdentifier(column.name)}"`,
+      column.type,
+    ];
+
+    if (column.primaryKey) {
+      parts.push('PRIMARY KEY');
+    }
+
+    if (column.notNull) {
+      parts.push('NOT NULL');
+    }
+
+    return `  ${parts.join(' ')}`;
+  });
+
+  return `CREATE TABLE "${safeTableName}" (\n${lines.join(',\n')}\n);`;
+}
+
+function buildInsertTemplate(tableName: string, columns: TableBuilderColumn[]): string {
+  const writableColumns = columns.filter((column) => !(column.primaryKey && column.type === 'INTEGER'));
+  const selectedColumns = writableColumns.length > 0 ? writableColumns : columns;
+  const columnNames = selectedColumns.map((column) => `"${escapeIdentifier(column.name)}"`).join(', ');
+  const values = selectedColumns.map((column) => sampleValueForType(column.type)).join(', ');
+
+  return `INSERT INTO "${escapeIdentifier(tableName)}" (${columnNames})\nVALUES (${values});`;
+}
+
+function sampleValueForType(type: string): string {
+  switch (type) {
+    case 'INTEGER':
+      return '1';
+    case 'REAL':
+      return '1.0';
+    case 'BLOB':
+      return "X'00'";
+    case 'TEXT':
+    default:
+      return "'sample'";
+  }
+}
+
+function escapeIdentifier(value: string): string {
+  return value.trim().replace(/"/g, '""');
 }

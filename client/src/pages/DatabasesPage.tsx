@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Database, Plus, Trash2, Download, Upload, GraduationCap, BookOpen, Heart,
+  Database, Plus, Trash2, Download, Upload, GraduationCap, BookOpen, Heart, ArrowRight,
   Landmark, Film, Building2, Users, ShoppingCart, UtensilsCrossed, Package,
   Briefcase, Warehouse, Globe,
 } from 'lucide-react';
@@ -17,9 +18,11 @@ const iconMap: Record<string, typeof Database> = {
 };
 
 export function DatabasesPage() {
+  const navigate = useNavigate();
   const [databases, setDatabases] = useState<Awaited<ReturnType<typeof databaseManager.listDatabases>>>([]);
   const [newDbName, setNewDbName] = useState('');
   const [loading, setLoading] = useState<string | null>(null);
+  const [createdDatabaseName, setCreatedDatabaseName] = useState<string | null>(null);
   const { setActiveDatabaseId } = useProgressStore();
 
   async function refresh() {
@@ -35,6 +38,7 @@ export function DatabasesPage() {
     if (!newDbName.trim()) return;
     const db = await databaseManager.createDatabase(newDbName.trim());
     setActiveDatabaseId(db.id);
+    setCreatedDatabaseName(db.name);
     setNewDbName('');
     await refresh();
   }
@@ -86,6 +90,9 @@ export function DatabasesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Create Database</CardTitle>
+          <CardDescription>
+            This creates an empty SQLite database. Next, open the playground to create tables and insert data.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex gap-2">
           <Input
@@ -101,6 +108,25 @@ export function DatabasesPage() {
           </label>
         </CardContent>
       </Card>
+
+      {createdDatabaseName && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">`{createdDatabaseName}` is ready</CardTitle>
+            <CardDescription>
+              A database file has been created successfully. It is empty right now, so the next step is to add tables and rows in the SQL Playground.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button onClick={() => navigate('/playground')}>
+              Open Playground <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" onClick={() => setCreatedDatabaseName(null)}>
+              Dismiss
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {databases.length > 0 && (
         <div>
@@ -119,7 +145,16 @@ export function DatabasesPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => setActiveDatabaseId(db.id)}>Use</Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setActiveDatabaseId(db.id);
+                      navigate('/playground');
+                    }}
+                  >
+                    Use in Playground
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => void exportDb(db.id, db.name)}>
                     <Download className="h-4 w-4" />
                   </Button>
