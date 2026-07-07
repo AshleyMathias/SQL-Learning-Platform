@@ -1,0 +1,473 @@
+[
+  {
+    "id": "lesson-01",
+    "slug": "what-is-data",
+    "title": "What is Data?",
+    "topic": "Basics",
+    "skillLevel": ["beginner"],
+    "order": 1,
+    "description": "Understand what data is and why it matters.",
+    "introduction": "Before writing SQL, let's understand what data actually is. Everything around you — names, prices, dates — is data waiting to be organized.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Data in Everyday Life",
+        "content": "Data is any piece of information that can be recorded and used. Your name, age, email address, the price of coffee, today's date — all of these are data points.",
+        "analogy": "Think of data like ingredients in a kitchen. A single tomato is one data point. A recipe card listing tomatoes, basil, and olive oil is a collection of related data.",
+        "visualType": "table",
+        "visualData": {
+          "headers": ["Name", "Age", "City"],
+          "rows": [["Alice", "25", "Boston"], ["Bob", "30", "Chicago"]]
+        },
+        "practice": {
+          "id": "p1",
+          "question": "Which of these is NOT data?",
+          "databaseId": "student-management",
+          "expectedColumns": ["answer"],
+          "expectedRows": [[{"answer": "A feeling of happiness"}]],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "Think about recording", "content": "Data can be written down, stored, and compared. Can you write down a feeling as a fact?"},
+            {"level": 2, "title": "Common mistake", "content": "Numbers and text are data. Abstract feelings without measurement are harder to store as data."},
+            {"level": 3, "title": "Answer", "content": "A feeling of happiness is subjective and not easily recorded as structured data."}
+          ],
+          "solution": "SELECT 'A feeling of happiness' AS answer;",
+          "explanation": "Data must be recordable. Names, ages, and prices can be stored. Feelings are subjective unless measured (like a survey rating)."
+        }
+      }
+    ],
+    "summary": [
+      "Data is any recordable information",
+      "Data can be numbers, text, dates, or true/false values",
+      "Organized data becomes useful for decisions"
+    ],
+    "tags": ["basics", "introduction"]
+  },
+  {
+    "id": "lesson-02",
+    "slug": "what-is-a-database",
+    "title": "What is a Database?",
+    "topic": "Basics",
+    "skillLevel": ["beginner"],
+    "order": 2,
+    "description": "Learn what databases are and how they store information.",
+    "introduction": "A database is an organized collection of data. Instead of scattered spreadsheets, a database keeps everything structured and searchable.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Database vs Spreadsheet",
+        "content": "A spreadsheet works for small lists. A database handles millions of records, enforces rules (like 'email must be unique'), and lets many users access data safely at the same time.",
+        "analogy": "A spreadsheet is like a notebook. A database is like a library with a catalog system — organized, searchable, and managed.",
+        "visualType": "diagram",
+        "visualData": {"type": "database", "tables": ["Students", "Courses", "Enrollments"]}
+      }
+    ],
+    "summary": ["A database stores organized data", "DBMS manages the database", "SQL is the language to talk to databases"],
+    "tags": ["basics", "database"]
+  },
+  {
+    "id": "lesson-03",
+    "slug": "tables-rows-columns",
+    "title": "Tables, Rows & Columns",
+    "topic": "Basics",
+    "skillLevel": ["beginner"],
+    "order": 3,
+    "description": "Master the fundamental building blocks of relational databases.",
+    "introduction": "Data in a database lives in tables. Think of a table like a spreadsheet with a strict structure.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Table Structure",
+        "content": "A **table** holds data about one type of thing (students, products, orders). **Columns** define what properties each item has (name, age, price). **Rows** are individual records — one complete item.",
+        "analogy": "A table is like a class attendance sheet. Columns are headers (Name, Roll No, Present). Each row is one student.",
+        "visualType": "table",
+        "visualData": {
+          "headers": ["student_id", "first_name", "age"],
+          "rows": [[1, "Alice", 20], [2, "Bob", 19]]
+        },
+        "exampleSql": "SELECT * FROM students;",
+        "practice": {
+          "id": "p1",
+          "question": "Write a query to see all columns and all rows from the students table.",
+          "databaseId": "student-management",
+          "expectedColumns": ["student_id", "first_name", "last_name", "email", "age", "enrollment_date", "gpa"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "SELECT and FROM", "content": "Use SELECT to choose columns and FROM to specify the table. * means all columns."},
+            {"level": 2, "title": "Table name", "content": "The table is called 'students' (plural). Make sure spelling matches exactly."},
+            {"level": 3, "title": "Expected output", "content": "You should see 8 rows with 7 columns each."}
+          ],
+          "solution": "SELECT * FROM students;",
+          "explanation": "SELECT * retrieves every column. FROM students tells SQLite which table to read."
+        }
+      }
+    ],
+    "summary": ["Tables store related data", "Columns are properties", "Rows are individual records"],
+    "tags": ["basics", "table"]
+  },
+  {
+    "id": "lesson-04",
+    "slug": "introduction-to-sql",
+    "title": "Introduction to SQL",
+    "topic": "Basics",
+    "skillLevel": ["beginner"],
+    "order": 4,
+    "description": "Learn what SQL is and write your first query.",
+    "introduction": "SQL (Structured Query Language) is how you communicate with a database. You ask questions, and the database answers with data.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Your First Query",
+        "content": "The most common SQL command is SELECT. It retrieves data from tables. Every query needs at minimum: SELECT (what to show) and FROM (where to get it).",
+        "exampleSql": "SELECT first_name, last_name FROM students;",
+        "practice": {
+          "id": "p1",
+          "question": "Select only the first_name and age columns from students.",
+          "databaseId": "student-management",
+          "expectedColumns": ["first_name", "age"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "Specific columns", "content": "Instead of *, list column names separated by commas after SELECT."},
+            {"level": 2, "title": "Spelling", "content": "Column names are first_name and age — use underscores, not spaces."},
+            {"level": 3, "title": "Expected", "content": "8 rows with two columns: first_name and age."}
+          ],
+          "solution": "SELECT first_name, age FROM students;",
+          "explanation": "Listing specific columns after SELECT returns only those fields."
+        }
+      }
+    ],
+    "summary": ["SQL talks to databases", "SELECT retrieves data", "FROM specifies the table"],
+    "tags": ["sql", "select"]
+  },
+  {
+    "id": "lesson-05",
+    "slug": "select-distinct",
+    "title": "SELECT & DISTINCT",
+    "topic": "SELECT",
+    "skillLevel": ["beginner", "intermediate"],
+    "order": 5,
+    "description": "Retrieve unique values and avoid duplicates.",
+    "introduction": "Sometimes you only want unique values. DISTINCT removes duplicate rows from your results.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Removing Duplicates",
+        "content": "SELECT DISTINCT column_name returns only unique values. Without DISTINCT, every matching row appears — even duplicates.",
+        "exampleSql": "SELECT DISTINCT department FROM courses;",
+        "practice": {
+          "id": "p1",
+          "question": "Get a list of unique departments from the courses table.",
+          "databaseId": "student-management",
+          "expectedColumns": ["department"],
+          "expectedRows": [[{"department": "Computer Science"}], [{"department": "Mathematics"}], [{"department": "Humanities"}], [{"department": "Science"}]],
+          "orderMatters": false,
+          "allowDuplicates": false,
+          "hints": [
+            {"level": 1, "title": "DISTINCT keyword", "content": "Add DISTINCT right after SELECT to get unique values."},
+            {"level": 2, "title": "One column", "content": "You only need the department column."},
+            {"level": 3, "title": "Expected", "content": "4 unique departments, no duplicates."}
+          ],
+          "solution": "SELECT DISTINCT department FROM courses;",
+          "explanation": "DISTINCT collapses duplicate department names into one row each."
+        }
+      }
+    ],
+    "summary": ["SELECT retrieves data", "DISTINCT removes duplicates", "Use DISTINCT on specific columns"],
+    "tags": ["select", "distinct"]
+  },
+  {
+    "id": "lesson-06",
+    "slug": "where-clause",
+    "title": "Filtering with WHERE",
+    "topic": "WHERE",
+    "skillLevel": ["beginner", "intermediate"],
+    "order": 6,
+    "description": "Filter rows using conditions.",
+    "introduction": "Not every row is relevant. WHERE lets you filter — like asking 'show me only students older than 20'.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Conditions",
+        "content": "WHERE comes after FROM and filters rows before they're returned. Use =, >, <, >=, <=, != for comparisons. Text values need single quotes: WHERE name = 'Alice'.",
+        "analogy": "WHERE is like a bouncer at a club — only rows that pass the condition get through.",
+        "exampleSql": "SELECT * FROM students WHERE age > 20;",
+        "practice": {
+          "id": "p1",
+          "question": "Find all students with a GPA greater than 3.5.",
+          "databaseId": "student-management",
+          "expectedColumns": ["student_id", "first_name", "last_name", "email", "age", "enrollment_date", "gpa"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "Comparison operator", "content": "Use > for 'greater than'. Numbers don't need quotes."},
+            {"level": 2, "title": "NULL values", "content": "Students with NULL GPA won't match > 3.5. That's expected."},
+            {"level": 3, "title": "Expected", "content": "Alice (3.8), Carol (3.9), and Grace (3.7) should appear."}
+          ],
+          "solution": "SELECT * FROM students WHERE gpa > 3.5;",
+          "explanation": "WHERE gpa > 3.5 filters to only rows where the GPA column exceeds 3.5."
+        }
+      }
+    ],
+    "summary": ["WHERE filters rows", "Use comparison operators", "Text values need quotes"],
+    "tags": ["where", "filtering"]
+  },
+  {
+    "id": "lesson-07",
+    "slug": "order-by-limit",
+    "title": "ORDER BY & LIMIT",
+    "topic": "ORDER BY",
+    "skillLevel": ["intermediate"],
+    "order": 7,
+    "description": "Sort results and limit how many rows you get.",
+    "introduction": "ORDER BY sorts your results. LIMIT caps how many rows are returned.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Sorting and Limiting",
+        "content": "ORDER BY column ASC sorts ascending (A→Z, 1→9). DESC sorts descending. LIMIT n returns only the first n rows after sorting.",
+        "exampleSql": "SELECT * FROM students ORDER BY gpa DESC LIMIT 3;",
+        "practice": {
+          "id": "p1",
+          "question": "Show the top 3 students by GPA (highest first).",
+          "databaseId": "student-management",
+          "expectedColumns": ["student_id", "first_name", "last_name", "email", "age", "enrollment_date", "gpa"],
+          "expectedRows": [],
+          "orderMatters": true,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "Sort direction", "content": "Use ORDER BY gpa DESC for highest first."},
+            {"level": 2, "title": "Limit rows", "content": "Add LIMIT 3 at the end."},
+            {"level": 3, "title": "Expected", "content": "Carol (3.9), Alice (3.8), Grace (3.7) in that order."}
+          ],
+          "solution": "SELECT * FROM students WHERE gpa IS NOT NULL ORDER BY gpa DESC LIMIT 3;",
+          "explanation": "ORDER BY gpa DESC sorts highest GPA first. LIMIT 3 keeps only the top 3."
+        }
+      }
+    ],
+    "summary": ["ORDER BY sorts results", "ASC and DESC control direction", "LIMIT restricts row count"],
+    "tags": ["order-by", "limit"]
+  },
+  {
+    "id": "lesson-08",
+    "slug": "like-in-between",
+    "title": "LIKE, IN & BETWEEN",
+    "topic": "LIKE",
+    "skillLevel": ["intermediate"],
+    "order": 8,
+    "description": "Pattern matching and range filtering.",
+    "introduction": "LIKE finds patterns in text. IN checks membership in a list. BETWEEN filters ranges.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Pattern Matching",
+        "content": "LIKE uses % as wildcard: 'A%' matches anything starting with A. IN (1,2,3) matches any value in the list. BETWEEN 10 AND 20 includes both endpoints.",
+        "exampleSql": "SELECT * FROM students WHERE first_name LIKE 'A%';",
+        "practice": {
+          "id": "p1",
+          "question": "Find students whose first name starts with 'C' or 'G'.",
+          "databaseId": "student-management",
+          "expectedColumns": ["student_id", "first_name", "last_name", "email", "age", "enrollment_date", "gpa"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "LIKE patterns", "content": "Use LIKE 'C%' for names starting with C."},
+            {"level": 2, "title": "Multiple conditions", "content": "Combine with OR: ... LIKE 'C%' OR first_name LIKE 'G%'"},
+            {"level": 3, "title": "Expected", "content": "Carol and Grace should appear."}
+          ],
+          "solution": "SELECT * FROM students WHERE first_name LIKE 'C%' OR first_name LIKE 'G%';",
+          "explanation": "LIKE with % wildcard matches patterns. OR combines multiple conditions."
+        }
+      }
+    ],
+    "summary": ["LIKE matches patterns with %", "IN checks list membership", "BETWEEN filters ranges"],
+    "tags": ["like", "in", "between"]
+  },
+  {
+    "id": "lesson-09",
+    "slug": "aggregate-functions",
+    "title": "Aggregate Functions",
+    "topic": "Aggregates",
+    "skillLevel": ["intermediate"],
+    "order": 9,
+    "description": "COUNT, SUM, AVG, MIN, MAX — summarize data.",
+    "introduction": "Aggregate functions crunch many rows into a single summary value.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Summarizing Data",
+        "content": "COUNT(*) counts rows. SUM(column) adds values. AVG(column) calculates average. MIN and MAX find extremes.",
+        "exampleSql": "SELECT COUNT(*) AS total, AVG(gpa) AS avg_gpa FROM students WHERE gpa IS NOT NULL;",
+        "practice": {
+          "id": "p1",
+          "question": "How many students are enrolled? Return the count as 'total_students'.",
+          "databaseId": "student-management",
+          "expectedColumns": ["total_students"],
+          "expectedRows": [[{"total_students": 8}]],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "COUNT", "content": "COUNT(*) counts all rows in the table."},
+            {"level": 2, "title": "Alias", "content": "Use AS total_students to name the result column."},
+            {"level": 3, "title": "Expected", "content": "One row with total_students = 8."}
+          ],
+          "solution": "SELECT COUNT(*) AS total_students FROM students;",
+          "explanation": "COUNT(*) returns the total number of rows — 8 students."
+        }
+      }
+    ],
+    "summary": ["Aggregates summarize data", "COUNT, SUM, AVG, MIN, MAX", "Use aliases for readable column names"],
+    "tags": ["aggregates", "count", "avg"]
+  },
+  {
+    "id": "lesson-10",
+    "slug": "group-by-having",
+    "title": "GROUP BY & HAVING",
+    "topic": "GROUP BY",
+    "skillLevel": ["intermediate"],
+    "order": 10,
+    "description": "Group rows and filter groups.",
+    "introduction": "GROUP BY splits data into groups. HAVING filters those groups after aggregation.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Grouping Data",
+        "content": "GROUP BY column creates one row per unique value. HAVING filters groups (like WHERE but for aggregates).",
+        "exampleSql": "SELECT department, COUNT(*) AS course_count FROM courses GROUP BY department HAVING COUNT(*) > 1;",
+        "practice": {
+          "id": "p1",
+          "question": "Count courses per department. Show department and course_count.",
+          "databaseId": "student-management",
+          "expectedColumns": ["department", "course_count"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "GROUP BY", "content": "Group by department, count rows in each group."},
+            {"level": 2, "title": "Non-aggregate columns", "content": "department must appear in GROUP BY since it's in SELECT."},
+            {"level": 3, "title": "Expected", "content": "4 rows, one per department with counts."}
+          ],
+          "solution": "SELECT department, COUNT(*) AS course_count FROM courses GROUP BY department;",
+          "explanation": "GROUP BY department creates groups. COUNT(*) counts courses in each."
+        }
+      }
+    ],
+    "summary": ["GROUP BY creates groups", "HAVING filters groups", "Non-aggregate columns must be in GROUP BY"],
+    "tags": ["group-by", "having"]
+  },
+  {
+    "id": "lesson-11",
+    "slug": "inner-join",
+    "title": "INNER JOIN",
+    "topic": "JOINs",
+    "skillLevel": ["intermediate"],
+    "order": 11,
+    "description": "Combine data from multiple tables.",
+    "introduction": "Real data lives across tables. JOINs connect them using shared keys.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Joining Tables",
+        "content": "INNER JOIN returns only rows that match in BOTH tables. The ON clause specifies how tables connect: ON students.student_id = enrollments.student_id.",
+        "analogy": "A JOIN is like matching puzzle pieces — only pieces that fit together (matching IDs) are kept.",
+        "exampleSql": "SELECT s.first_name, c.course_name FROM students s INNER JOIN enrollments e ON s.student_id = e.student_id INNER JOIN courses c ON e.course_id = c.course_id;",
+        "practice": {
+          "id": "p1",
+          "question": "Show student first names and their enrolled course names.",
+          "databaseId": "student-management",
+          "expectedColumns": ["first_name", "course_name"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "Three tables", "content": "Join students → enrollments → courses."},
+            {"level": 2, "title": "ON clause", "content": "Match student_id and course_id in the bridge table."},
+            {"level": 3, "title": "Expected", "content": "10 rows pairing student names with course names."}
+          ],
+          "solution": "SELECT s.first_name, c.course_name FROM students s INNER JOIN enrollments e ON s.student_id = e.student_id INNER JOIN courses c ON e.course_id = c.course_id;",
+          "explanation": "INNER JOIN connects students to courses through the enrollments bridge table."
+        }
+      }
+    ],
+    "summary": ["JOINs combine tables", "INNER JOIN keeps matching rows only", "ON specifies the join condition"],
+    "tags": ["join", "inner-join"]
+  },
+  {
+    "id": "lesson-12",
+    "slug": "left-join",
+    "title": "LEFT JOIN",
+    "topic": "JOINs",
+    "skillLevel": ["intermediate", "advanced"],
+    "order": 12,
+    "description": "Keep all rows from the left table, even without matches.",
+    "introduction": "LEFT JOIN keeps every row from the left table. Unmatched right-side columns show NULL.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Preserving Unmatched Rows",
+        "content": "LEFT JOIN is essential for finding 'missing' data — students with no enrollments, books never borrowed, etc.",
+        "exampleSql": "SELECT s.first_name, e.grade FROM students s LEFT JOIN enrollments e ON s.student_id = e.student_id;",
+        "practice": {
+          "id": "p1",
+          "question": "List all students and their grades. Include students with no enrollments.",
+          "databaseId": "student-management",
+          "expectedColumns": ["first_name", "grade"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "LEFT JOIN", "content": "Use LEFT JOIN so all students appear, even without enrollments."},
+            {"level": 2, "title": "NULL grades", "content": "Frank has no enrollments — his grade will be NULL."},
+            {"level": 3, "title": "Expected", "content": "More rows than students — students with multiple enrollments appear multiple times."}
+          ],
+          "solution": "SELECT s.first_name, e.grade FROM students s LEFT JOIN enrollments e ON s.student_id = e.student_id;",
+          "explanation": "LEFT JOIN preserves all left-table rows. NULL appears where no match exists."
+        }
+      }
+    ],
+    "summary": ["LEFT JOIN keeps all left rows", "Unmatched columns are NULL", "Great for finding missing relationships"],
+    "tags": ["join", "left-join"]
+  },
+  {
+    "id": "lesson-13",
+    "slug": "subqueries-cte",
+    "title": "Subqueries & CTEs",
+    "topic": "Subqueries",
+    "skillLevel": ["advanced"],
+    "order": 13,
+    "description": "Nest queries and use Common Table Expressions.",
+    "introduction": "Subqueries are queries inside queries. CTEs (WITH clause) make complex queries readable.",
+    "sections": [
+      {
+        "id": "s1",
+        "title": "Queries Within Queries",
+        "content": "A subquery in WHERE filters based on another query's result. CTEs define temporary named results: WITH high_gpa AS (SELECT ...) SELECT * FROM high_gpa;",
+        "exampleSql": "WITH avg_gpa AS (SELECT AVG(gpa) AS avg FROM students WHERE gpa IS NOT NULL) SELECT * FROM students, avg_gpa WHERE students.gpa > avg_gpa.avg;",
+        "practice": {
+          "id": "p1",
+          "question": "Find students with GPA above the average GPA.",
+          "databaseId": "student-management",
+          "expectedColumns": ["student_id", "first_name", "last_name", "email", "age", "enrollment_date", "gpa"],
+          "expectedRows": [],
+          "orderMatters": false,
+          "allowDuplicates": true,
+          "hints": [
+            {"level": 1, "title": "Subquery", "content": "Compare gpa against (SELECT AVG(gpa) FROM students WHERE gpa IS NOT NULL)."},
+            {"level": 2, "title": "NULL handling", "content": "Exclude NULL GPAs from the average calculation."},
+            {"level": 3, "title": "Expected", "content": "Students with above-average GPA."}
+          ],
+          "solution": "SELECT * FROM students WHERE gpa > (SELECT AVG(gpa) FROM students WHERE gpa IS NOT NULL);",
+          "explanation": "The subquery calculates average GPA. The outer query filters students above that value."
+        }
+      }
+    ],
+    "summary": ["Subqueries nest inside other queries", "CTEs improve readability", "Use WITH for named temporary results"],
+    "tags": ["subquery", "cte"]
+  }
+]
